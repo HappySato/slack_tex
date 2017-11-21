@@ -1,7 +1,6 @@
 /*
 ファイル=>プロジェクトのプロパティ
 スクリプトのプロパティ　に以下の2つを設定
-
 SLACK_WEBHOOK_TOKEN:incoming webhookのトークン
 POST_URL:outgoing webhookのURL
 */
@@ -11,25 +10,25 @@ var POST_URL = PropertiesService.getScriptProperties().getProperty('POST_URL');
 
 function doPost(e) {
     var webhook_token = SLACK_WEBHOOK_TOKEN;
-    if (e.parameter.token == webhook_token ) return doGenerateImg(e);
+    if (e.parameter.token == webhook_token ) return slack_post_message (e);
     else return 0;
 }
 
 
-function doGenerateImg (e) {
-    slack_post_message(
-        "#" + e.parameter.channel_name,
-        "https://chart.googleapis.com/chart?cht=tx&chl=" + encodeURIComponent(trim_(e.parameter.text.substr(3)))
-    );
-}
 
-function slack_post_message (channel, str){
+function slack_post_message (e){
     var postUrl   = POST_URL
     var jsonData =
     {
-      "channel" : channel,
+      "channel" : e.parameter.channel_name,
       "username" : "tex",
-      "text" : str
+      "text" : "",
+      "attachments": [
+      {
+        "color": "#ff8e2b",
+        "image_url": "https://chart.googleapis.com/chart?cht=tx&chl=" + encodeURIComponent(e.parameter.text.substr(3)),
+      }
+    ]
     };
     var payload = JSON.stringify(jsonData);
     var options =
